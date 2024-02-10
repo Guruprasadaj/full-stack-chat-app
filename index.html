@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Include Bootstrap CSS -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <link rel="stylesheet" href="style.css">
+<script src="client.js"></script>
+
+  <title>WebSocket Chat</title>
+  <style>
+    /* Custom Styles */
+    body {
+      padding: 20px;
+    }
+
+    /* Optional: Add your own custom styles here */
+  </style>
+</head>
+<body class="container">
+
+  <div class="jumbotron">
+    <h1 class="display-4">WebSocket Chat</h1>
+  </div>
+
+  <div class="row">
+    <div class="col-md-6">
+      <div class="form-group">
+        <label for="roomId">Room ID:</label>
+        <input type="text" class="form-control" id="roomId">
+      </div>
+      <button class="btn btn-primary" onclick="createRoom()">Create Room</button>
+    </div>
+
+    <div class="col-md-6">
+      <div class="form-group">
+        <label for="username">Username:</label>
+        <input type="text" class="form-control" id="username">
+      </div>
+      <div class="form-check">
+        <input type="checkbox" class="form-check-input" id="isAdmin">
+        <label class="form-check-label" for="isAdmin">Admin</label>
+      </div>
+      <button class="btn btn-success" onclick="joinRoom()">Join Room</button>
+    </div>
+  </div>
+  <div class="form-group">
+    <label for="fileInput">Choose File:</label>
+    <input type="file" id="fileInput" class="form-control-file">
+  </div>
+
+  <div class="form-group">
+    <label for="messageInput">Message:</label>
+    <textarea class="form-control" id="messageInput" placeholder="Type your message"></textarea>
+  </div>
+  <button class="btn btn-info" onclick="sendMessage()">Send</button>
+
+  <ul id="chatMessages" class="list-group mt-3"></ul>
+
+  <script>
+    const ws = new WebSocket('ws://localhost:3000');
+
+    ws.onmessage = (event) => {
+      const { type, data } = JSON.parse(event.data);
+      switch (type) {
+        case 'updateRooms':
+          updateRooms(data);
+          break;
+        case 'roomJoined':
+          roomJoined(data);
+          break;
+        case 'newMessage':
+          newMessage(data);
+          break;
+        // Handle other message types
+      }
+    }
